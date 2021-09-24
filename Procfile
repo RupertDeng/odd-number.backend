@@ -1,1 +1,1 @@
-web: gunicorn odd-number:wsgi
+web: gunicorn app:app
