@@ -23,17 +23,18 @@ def search(number):
     upsert=True,
     return_document=ReturnDocument.AFTER
     )
-  response = {
+  result = {
     'searched': record['searched'],
     'messages': record['messages'] if 'messages' in record else [],
   }
-  return jsonify({'response': response})
+  response = make_response(jsonify(result), 200)
+  return response
 
 
 @app.route('/add-message/<number>', methods=['POST'])
 def add_message(number):
   data = request.get_json()
-  time_id = str(datetime.now())
+  time_id = str(datetime.now()).replace(' ', '+')
   new_message = {
       'time_id': time_id,
       'tag': data['tag'],
@@ -49,7 +50,8 @@ def add_message(number):
   response = make_response('message added', 201)
   return response
 
-
+@app.route('/delete-message/<number>/<time_id>', methods=['DELETE'])
+def delete_message(number, time_id):
 
 
 
