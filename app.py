@@ -4,7 +4,8 @@ from pymongo import MongoClient
 app = Flask(__name__)
 client = MongoClient('localhost', 27017)
 db = client.odd_number
-collection = db.number_pool
+number_pool = db.number_pool
+ip_pool = db.ip_pool
 
 @app.route('/')
 def index():
@@ -12,7 +13,8 @@ def index():
 
 @app.route('/search/<number>')
 def search(number):
-  pass
+  
+
 
 
 
