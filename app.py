@@ -15,7 +15,7 @@ def index():
   return '<h1>Website under construction. Please visit later.</h1>'
 
 
-@app.route('/search/<number>')
+@app.route('/search/<number>', methods=['GET'])
 def search(number):
   record = number_pool.find_one_and_update(
     {'number': number},
@@ -51,18 +51,42 @@ def add_message(number):
   return response
 
 
-@app.route('/delete-message/<number>/<time_id>', methods=['DELETE'])
-def delete_message(number, time_id):
+@app.route('/delete-message/<number>/<message_id>', methods=['DELETE'])
+def delete_message(number, message_id):
   number_pool.update_one(
     {'number': number},
-    {'$pull': {'messages': {'time_id': time_id}}}
+    {'$pull': {'messages': {'time_id': message_id}}}
   )
   response = make_response('message deleted', 200)
   return response
 
 
+def register_vote(number, message_id, vote_type, operation):
+  incre = 1 if operation == 'vote' else -1
+  if vote_type == 'up':
+    number_pool.update_one(
+      {'number': number, 'messages.time_id': message_id},
+      {'$inc': {'messages.$.upvote': incre}}
+    )
+  else:
+    number_pool.update_one(
+      {'number': number, 'messages.time_id': message_id},
+      {'$inc': {'messages.$.downvote': incre}}
+    )
 
+@app.route('/vote/<number>/<message_id>/<vote_type>', methods=['PATCH'])
+def vote_message(number, message_id, vote_type):
+  register_vote(number, message_id, vote_type, 'vote')
+  response = make_response('vote marked', 200)
+  return response
 
+@app.route('/unvote/<number>/<message_id>/<vote_type>', methods=['PATCH'])
+def unvote_message(number, message_id, vote_type):
+  register_vote(number, message_id, vote_type, 'unvote')
+  response = make_response('vote reverted', 200)
+  return response
+
+  
 
 if __name__ == '__main__':
   app.run(debug=True)
