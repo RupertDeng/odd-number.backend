@@ -47,12 +47,18 @@ def add_message(number):
     {'$push': {'messages': new_message}},
     upsert=True
   )
-  response = make_response('message added', 201)
+  response = make_response('message added', 200)
   return response
+
 
 @app.route('/delete-message/<number>/<time_id>', methods=['DELETE'])
 def delete_message(number, time_id):
-
+  number_pool.update_one(
+    {'number': number},
+    {'$pull': {'messages': {'time_id': time_id}}}
+  )
+  response = make_response('message deleted', 200)
+  return response
 
 
 
