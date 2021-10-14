@@ -2,9 +2,10 @@ from flask import Flask, jsonify, request, make_response
 from pymongo import MongoClient
 from pymongo.collection import ReturnDocument
 from datetime import datetime
+from config import DB_CONN_STR, APP_API_KEY
 
 app = Flask(__name__)
-client = MongoClient('localhost', 27017)
+client = MongoClient(DB_CONN_STR)
 db = client.odd_number
 number_pool = db.number_pool
 ip_pool = db.ip_pool
