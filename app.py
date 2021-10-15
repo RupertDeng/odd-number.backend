@@ -31,6 +31,7 @@ def search(number):
     return_document=ReturnDocument.AFTER
     )
   result = {
+    'number': record['number'],
     'searched': record['searched'],
     'messages': record['messages'] if 'messages' in record else [],
   }
