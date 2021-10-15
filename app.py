@@ -13,11 +13,15 @@ ip_pool = db.ip_pool
 
 @app.route('/')
 def index():
-  return '<h1>Website under construction. Please visit later.</h1>'
+  return '<h1>Please visit the web app <a href="https://odd-number.netlify.app/">"Odd Number"</a> for full service.</h1>'
 
 
+# endpoint for seraching a number
 @app.route('/search/<number>', methods=['GET'])
 def search(number):
+  auth = request.headers.get('X-Api-Key')
+  if auth != APP_API_KEY:
+    return make_response('Api access not granted', 401)
   record = number_pool.find_one_and_update(
     {'number': number},
     {'$inc': {'searched': 1}},
@@ -31,9 +35,12 @@ def search(number):
   response = make_response(jsonify(result), 200)
   return response
 
-
+# endpoint to add a message under a number
 @app.route('/add-message/<number>', methods=['POST'])
 def add_message(number):
+  auth = request.headers.get('X-Api-Key')
+  if auth != APP_API_KEY:
+    return make_response('Api access not granted', 401)
   data = request.get_json()
   time_id = str(datetime.now()).replace(' ', '+')
   new_message = {
@@ -51,9 +58,12 @@ def add_message(number):
   response = make_response('message added', 200)
   return response
 
-
+# endpoint to delete a specific message under a number
 @app.route('/delete-message/<number>/<message_id>', methods=['DELETE'])
 def delete_message(number, message_id):
+  auth = request.headers.get('X-Api-Key')
+  if auth != APP_API_KEY:
+    return make_response('Api access not granted', 401)
   number_pool.update_one(
     {'number': number},
     {'$pull': {'messages': {'time_id': message_id}}}
@@ -75,14 +85,22 @@ def register_vote(number, message_id, vote_type, operation):
       {'$inc': {'messages.$.downvote': incre}}
     )
 
+# endpoint to vote on a specific message under a number
 @app.route('/vote/<number>/<message_id>/<vote_type>', methods=['PATCH'])
 def vote_message(number, message_id, vote_type):
+  auth = request.headers.get('X-Api-Key')
+  if auth != APP_API_KEY:
+    return make_response('Api access not granted', 401)
   register_vote(number, message_id, vote_type, 'vote')
   response = make_response('vote marked', 200)
   return response
 
+# endpoint to unvote on a specifc message under a number
 @app.route('/unvote/<number>/<message_id>/<vote_type>', methods=['PATCH'])
 def unvote_message(number, message_id, vote_type):
+  auth = request.headers.get('X-Api-Key')
+  if auth != APP_API_KEY:
+    return make_response('Api access not granted', 401)
   register_vote(number, message_id, vote_type, 'unvote')
   response = make_response('vote reverted', 200)
   return response
