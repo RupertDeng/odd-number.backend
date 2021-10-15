@@ -112,7 +112,6 @@ def unvote_message(number, message_id, vote_type):
 
 if __name__ == '__main__':
   app.run(debug=True)
-  print('success')
 
 
 
