@@ -2,9 +2,11 @@ from flask import Flask, jsonify, request, make_response
 from pymongo import MongoClient
 from pymongo.collection import ReturnDocument
 from datetime import datetime
-from config import DB_CONN_STR, APP_API_KEY
+from config import DB_CONN_STR, APP_API_KEY, FE_STR
+from flask_cors import CORS
 
 app = Flask(__name__)
+cors = CORS(app, resources={r'/*': {'origins': FE_STR}})
 client = MongoClient(DB_CONN_STR)
 db = client.odd_number
 number_pool = db.number_pool
@@ -21,7 +23,7 @@ def index():
 def search(number):
   auth = request.headers.get('X-Api-Key')
   if auth != APP_API_KEY:
-    return make_response('Api access not granted', 401)
+    return make_response('API access not granted', 401)
   record = number_pool.find_one_and_update(
     {'number': number},
     {'$inc': {'searched': 1}},
