@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request, make_response
 from pymongo import MongoClient
 from pymongo.collection import ReturnDocument
 from datetime import datetime
+from pytz import timezone, utc
 from config import DB_CONN_STR, APP_API_KEY, FE_STR
 from flask_cors import CORS
 
@@ -45,7 +46,7 @@ def add_message(number):
   if auth != APP_API_KEY:
     return make_response('Api access not granted', 401)
   data = request.get_json()
-  time_id = str(datetime.now()).replace(' ', '+')
+  time_id = str(datetime.now(tz=utc).astimezone(timezone('US/Eastern'))).replace(' ', '~')
   new_message = {
       'time_id': time_id,
       'tag': data['tag'],
