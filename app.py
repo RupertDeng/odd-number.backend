@@ -51,7 +51,7 @@ def add_message(number):
     return make_response('Api access not granted', 401)
 
   # get visitorId from cookie to assign as message owner. if no cookie, assign one.
-  visitorId = request.cookies.get('visitorId')
+  visitorId = request.headers.get('visitorId')
   if not visitorId:
     vID = uuid4().hex
   else:
