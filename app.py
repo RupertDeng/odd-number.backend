@@ -74,8 +74,6 @@ def add_message(number):
     upsert=True
   )
   response = make_response(new_message, 200)
-  if not visitorId:
-    response.set_cookie('visitorId', vID)
   return response
 
 # endpoint to delete a specific message under a number
