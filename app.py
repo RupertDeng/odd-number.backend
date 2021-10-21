@@ -119,24 +119,16 @@ def register_vote(number, message_id, vote_type, operation):
       {'$inc': {'messages.$.downvote': incre}}
     )
 
-# endpoint to vote on a specific message under a number
-@app.route('/vote/<number>/<message_id>/<vote_type>', methods=['PATCH'])
-def vote_message(number, message_id, vote_type):
+# endpoint to vote or unvote on a specific message under a number
+@app.route('/vote-message/<number>/<message_id>/<vote_type>/<vote_operation>', methods=['PATCH'])
+def vote_message(number, message_id, vote_type, vote_operation):
   auth = request.headers.get('X-Api-Key')
   if auth != APP_API_KEY:
     return make_response('Api access not granted', 401)
-  register_vote(number, message_id, vote_type, 'vote')
-  response = make_response('vote marked', 200)
-  return response
-
-# endpoint to unvote on a specifc message under a number
-@app.route('/unvote/<number>/<message_id>/<vote_type>', methods=['PATCH'])
-def unvote_message(number, message_id, vote_type):
-  auth = request.headers.get('X-Api-Key')
-  if auth != APP_API_KEY:
-    return make_response('Api access not granted', 401)
-  register_vote(number, message_id, vote_type, 'unvote')
-  response = make_response('vote reverted', 200)
+  if vote_type not in ['up', 'down'] or vote_operation not in ['vote', 'unvote']:
+    return make_response('Operation not allowed', 405)
+  register_vote(number, message_id, vote_type, vote_operation)
+  response = make_response('vote successful', 200)
   return response
 
   
