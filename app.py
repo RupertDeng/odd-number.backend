@@ -9,7 +9,7 @@ from uuid import uuid4
 from hashlib import sha256
 
 app = Flask(__name__)
-cors = CORS(app, resources={r'/*': {'origins': FE_STR}}, expose_headers='X-visitorId')
+cors = CORS(app, resources={r'/*': {'origins': FE_STR}}, expose_headers='X-Visitorid')
 client = MongoClient(DB_CONN_STR)
 db = client.odd_number
 number_pool = db.number_pool
@@ -55,7 +55,7 @@ def add_message(number):
     return make_response('Api access not granted', 401)
 
   # get visitorId from cookie to assign as message owner. if no cookie, assign one.
-  visitorId = request.headers.get('X-visitorId')
+  visitorId = request.headers.get('X-Visitorid')
   if not visitorId:
     visitorId = uuid4().hex
 
@@ -76,7 +76,7 @@ def add_message(number):
     {'$push': {'messages': new_message}},
     upsert=True
   )
-  response = make_response(new_message, 200, {'X-visitorId': visitorId})
+  response = make_response(new_message, 200, {'X-Visitorid': visitorId})
   return response
 
 
@@ -90,8 +90,8 @@ def delete_message(number, message_id):
     return make_response('Api access not granted', 401)
 
   # get visitorId from cookie and check against database message owner. reject request if not match
-  visitorId = request.cookies.get('X-visitorId')
-  message_posted = number_pool.find_one({'number': number, 'messages.time_id': message_id}, {'messages.vID.$': 1})
+  visitorId = request.headers['X-Visitorid']
+  message_posted = number_pool.find_one({'number': number, 'messages.time_id': message_id}, {'messages.pID.$': 1})
   message_owner = message_posted['messages'][0]['pID']
   if message_owner != sha256(visitorId.encode('utf-8')).hexdigest():
     return make_response('Operation not allowed', 405)
