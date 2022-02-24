@@ -77,7 +77,10 @@ def add_message(number):
     return make_response('Api access not granted', 401)
 
   # check if visitor's ip has exceed message limit (5 messages per 24 hours)
-  visitor_ip = request.remote_addr
+  if not request.headers.getlist("X-Forwarded-For"):
+    visitor_ip = request.remote_addr
+  else:
+    visitor_ip = request.headers.getlist("X-Forwarded-For")[0]
   if rate_limited(visitor_ip, 'message', 5):
     return make_response('Message limit exceeded!', 429)
   
@@ -156,7 +159,10 @@ def vote_message(number, message_id, vote_type, vote_operation):
     return make_response('Operation not allowed', 405)
 
   # check if visitor ip has exceed vote limit (10 votes per 24 hours)
-  visitor_ip = request.remote_addr
+  if not request.headers.getlist("X-Forwarded-For"):
+    visitor_ip = request.remote_addr
+  else:
+    visitor_ip = request.headers.getlist("X-Forwarded-For")[0]
   if rate_limited(visitor_ip, 'vote', 10):
     return make_response('Vote limit exceeded!', 429)
 
