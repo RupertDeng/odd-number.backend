@@ -20,3 +20,6 @@
 - A simple rate limiter is implemented on backend to mitigate this concern (although can't completely prevent it).
 - The same ip address can only post at most 5 messages and vote at most 10 times in every 24 hours.
 - Rate limiter data is stored in heroku `memcached cloud`.
+<br/>
+
+### _For frontend implementation, please check the repository: ['Odd Number' Frontend](https://github.com/RupertDeng/odd-number.frontend)_ 
